@@ -23,15 +23,37 @@ class Ingredient(dict):
 
     def __mul__(self, other):
         if type(other) == int or type(other) == float:
-            return Ingredient(self.ingredient_name, other * self.quantity, self.measure)
+            return Ingredient(self.ingredient_name, self.quantity * other, self.measure)
         return self
+
+    def __str__(self):
+        return f'{self.ingredient_name} | {str(round(self.quantity, 2))} | {self.measure}'
+
+    # def __hash__(self):
+    #     return hash(str(self))
+
+    def __eq__(self, other):
+        if isinstance(other, Ingredient):
+            return self.ingredient_name == other.ingredient_name
+        return False
 
 
 def get_shop_list_by_dishes(dishes, person_count=1):
-    uniq_ingredients = set()
+    def shop_list_to_dict(ingred_list):
+        d = {ingred.ingredient_name: {'measure': ingred.measure, 'quantity': ingred.quantity} for ingred in ingred_list}
+        return d
+
+    shop_list = []
     for dish in dishes:
-        uniq_ingredients.update(cook_book[dish])
-    return uniq_ingredients
+        ingredient_list = cook_book.get(dish)
+        if ingredient_list:
+            for ingredient_item in ingredient_list:
+                if ingredient_item in shop_list:
+                    shop_list[shop_list.index(ingredient_item)] += ingredient_item * person_count
+                else:
+                    shop_list.append(ingredient_item * person_count)
+
+    return shop_list_to_dict(shop_list)
 
 
 cook_book = {}
@@ -54,14 +76,14 @@ print(cook_book)
 # print(type(cook_book['Омлет'][2]))
 # print(type(cook_book['Омлет'][2] + cook_book['Фахитос'][4]))
 # print(type(cook_book['Омлет'][2] * 3))
-#
+# print(cook_book['Омлет'][2] == cook_book['Фахитос'][4])
+
 # print(cook_book['Омлет'][2] + cook_book['Фахитос'][4])
 # print(cook_book['Омлет'][2] * 4)
 
-shop_list = get_shop_list_by_dishes(['Омлет', 'Фахитос'])
-print(shop_list)
-print(type(shop_list))
+shopping_list = get_shop_list_by_dishes(['Омлет', 'Фахитос'], 3)
+print(shopping_list)
 
-for item in shop_list:
-    print(item)
-    print(type(item))
+for k, v in shopping_list.items():
+    print(k, ': ', v)
+# print(len(shopping_list))
