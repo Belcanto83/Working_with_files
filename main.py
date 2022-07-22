@@ -3,6 +3,7 @@ import os
 FILE_DIR = 'files'
 FILE_NAME = 'recipes.txt'
 absolute_file_path = os.path.join(os.getcwd(), FILE_DIR, FILE_NAME)
+CHUNK_SIZE = 8192
 
 
 # Задачи № 1 - 2
@@ -85,8 +86,8 @@ print(cook_book)
 shopping_list = get_shop_list_by_dishes(['Омлет', 'Фахитос'], 3)
 print(shopping_list)
 
-# for k, v in shopping_list.items():
-#     print(k, ': ', v)
+for k, v in shopping_list.items():
+    print(k, ': ', v)
 
 ######################################################################################################################
 
@@ -98,27 +99,29 @@ files = [f for f in os.listdir(ABS_FILES_DIR_PATH)
          if os.path.isfile(os.path.join(ABS_FILES_DIR_PATH, f))]
 # text_files = [os.path.join(ABS_FILES_DIR, f) for f in files if f[-4:] == '.txt']
 text_files_names = [f for f in files if f[-4:] == '.txt']
-print(text_files_names)
+# print(text_files_names)
 
 
 def define_number_of_rows_in_text_files(file_list, chunk_size=8192):
     res = []
     for f in file_list:
-        with open(os.path.join(ABS_FILES_DIR_PATH, f), encoding='utf-8') as file_ob:
-            s = sum(chunk.count('\n') for chunk in iter(lambda: file_ob.read(chunk_size), ''))
+        with open(os.path.join(ABS_FILES_DIR_PATH, f), encoding='utf-8') as file_obj:
+            s = sum(chunk_.count('\n') for chunk_ in iter(lambda: file_obj.read(chunk_size), ''))
         res.append(s)
     return res
 
 
 number_of_rows = define_number_of_rows_in_text_files(text_files_names)
-print(number_of_rows)
-print(list(zip(text_files_names, number_of_rows)))
+# print(number_of_rows)
+# print(list(zip(text_files_names, number_of_rows)))
 print(sorted(zip(text_files_names, number_of_rows), key=lambda itm: itm[1]))
 
 with open(os.path.join(ABS_FILES_DIR_PATH, 'result.txt'), 'a', encoding='utf-8') as target_file:
     for f, rows_count in sorted(zip(text_files_names, number_of_rows), key=lambda itm: itm[1]):
         with open(os.path.join(ABS_FILES_DIR_PATH, f), encoding='utf-8') as file_obj:
-            content = file_obj.read()
             target_file.write(f + '\n')
             target_file.write(str(rows_count) + '\n')
-            target_file.write(content + '\n')
+            # target_file.write(file_obj.read() + '\n')
+            for chunk in iter(lambda: file_obj.read(CHUNK_SIZE), ''):
+                target_file.write(chunk)
+            target_file.write('\n')
