@@ -105,8 +105,8 @@ text_files_names = [f for f in files if f[-4:] == '.txt']
 def define_number_of_rows_in_text_files(file_list, chunk_size=8192):
     res = []
     for f in file_list:
-        with open(os.path.join(ABS_FILES_DIR_PATH, f), encoding='utf-8') as file_obj:
-            s = sum(chunk_.count('\n') for chunk_ in iter(lambda: file_obj.read(chunk_size), ''))
+        with open(os.path.join(ABS_FILES_DIR_PATH, f), encoding='utf-8') as file_ob:
+            s = sum(chunk_.count('\n') for chunk_ in iter(lambda: file_ob.read(chunk_size), ''))
         res.append(s)
     return res
 
